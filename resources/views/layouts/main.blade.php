@@ -5,13 +5,11 @@
   <title>Posts</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-{{--  <a class="navbar-brand" href="#">Top navbar</a>--}}
-{{--  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">--}}
-{{--    <span class="navbar-toggler-icon"></span>--}}
-{{--  </button>--}}
+  <a class="navbar-brand" href="{{ route('home') }}">Home</a>
   <div class="collapse navbar-collapse" id="navbarCollapse">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
@@ -32,5 +30,11 @@
   <div class="container">
       @yield('content')
   </div>
+
+<script src="https://code.jquery.com/jquery-3.4.0.js"></script>
+@yield('script')
+{{--<script src="{{ asset('assets/js/jquery-1.11.2.min.js') }}"></script>--}}
+
 </body>
 </html>
+

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
@@ -43,6 +44,7 @@ class PostController extends Controller
         ]);
 
         $posts = $request->except('_token');
+        $posts['user_id'] = Auth::id();
         Post::create($posts);
 
         return redirect()->route('posts.index');
@@ -57,7 +59,8 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        $comment = $post->comments();
+        $comment = $post->comments;
+//        dd($comment);
         return view('post.show', compact('post', 'comment'));
     }
 

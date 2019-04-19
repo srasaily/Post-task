@@ -35,19 +35,24 @@ class CommentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, $postId)
+    public function store(Request $request, Post $post)
     {
-//       $user = Auth::user()->id;
-//        $user->posts->comments()->post_id;
-        $post = Post::findOrFail($postId);
         $request->validate([
             'comment' => 'required'
         ]);
 
-        $request['post_id'] = $postId;
-        $comment = $request->except('_token');
+        $data = $request->all();
 
-        dd($comment);
+//        $comment = new Comment();
+//        $comment->comment = $data['comment'];
+//
+//        $result = $post->comments()->save($comment);
+
+        $response = $post->comments()->create($data);
+        return response()->json([ "res" => $response ]);
+
+//        $comment = $request->except('_token');
+//        Comment::create($comment);
     }
 
     /**
@@ -90,8 +95,8 @@ class CommentController extends Controller
      * @param  \App\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Comment $comment)
+    public function destroy(Request $request)
     {
-        //
+        
     }
 }

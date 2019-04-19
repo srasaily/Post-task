@@ -30,6 +30,7 @@ Route::prefix('posts')->group(function(){
 
 //    Route::get('/comments/create', 'CommentController@create')->name('comments.create');
     Route::post('/comments/{post}', 'CommentController@store')->name('comments.store');
+    Route::post('/comment-delete', 'CommentController@destroy')->name('comments.destroy');
 
 });
 
