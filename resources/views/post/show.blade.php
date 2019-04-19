@@ -9,7 +9,7 @@
     </div>
 
    <div class="well">
-     {!! Form::open(['route' => ['comments.store', $post->id], 'method' => 'post', 'id' => 'commentForm']) !!}
+     {!! Form::open(['route' => ['comments.store', $post->id], 'method' => 'post', 'id' => 'commentForm', 'data-id' => $post->id]) !!}
 
      <div class="row">
        <div class="form-group">
@@ -24,17 +24,7 @@
    </div>
 
     <div>
-      <ul  id="comment-section" class="list-group">
-
-          @foreach($post->comments as $comment)
-            <li class="list-group-item justify-content-between">{{ $comment->comment }}
-{{--              {!! Form::open(['route' => ['comments.destroy', $comment->id], 'method' => 'delete']) !!}--}}
-              	<button type="button" class="btn btn-sm btn-danger delete" id="{{ $comment->id }}">Delete</button>
-{{--              {!! Form::close() !!}--}}
-            </li>
-          @endforeach
-
-      </ul>
+      <ul  id="comment-section" class="list-group"></ul>
     </div>
 
   </div>
@@ -46,62 +36,146 @@
   <script>
     $(document).ready(function() {
 
-      function listComments(res) {
-        var ul = $('#comment-section');
+      fetch_data();
 
-        ul.append(`
-                <li class="list-group-item justify-content-between">${res.res.comment}
-                    <button type="button" id="${res.res.id}" class="btn btn-sm btn-danger delete">Delete</button>
-                </li>
-            `);
+      function fetch_data() {
 
-        $('#comment').val('');
-      }
-
-      $('#commentForm').submit(function(e) {
-        e.preventDefault();
-        $form = $(this);
-        let comment = $('#comment').val();
+        var post_id = $("#commentForm").data('id');
 
         $.ajax({
-          url: $form.attr('action'),
-          type: "POST",
+          url : "/posts/"+post_id+"/comments",
+          type: "GET",
+          dataType: "json",
+          success: function(data) {
+
+            var html = '';
+
+            for(var count=0; count < data.length; count++){
+              html += `<li class="list-group-item justify-content-between">${data[count].comment}
+                            <button type="button" id="${data[count].id}" class="btn btn-sm btn-danger delete">Delete</button>
+                       </li>`;
+            }
+
+            $("#comment-section").html(html);
+          }
+        });
+      }
+
+      $("#commentForm").submit(function(e) {
+        e.preventDefault();
+        $form = $(this);
+
+        var comment = $("#comment").val();
+
+        $.ajax({
+          url : $form.attr('action'),
+          type: 'POST',
           headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
           },
-          data: {'comment': comment},
+          data: { 'comment' : comment },
+          success: function(response) {
+            fetch_data();
 
-          success: function(res) {
-            // $('.hidden').show().removeClass('hidden');
-            listComments(res);
-          },
-          error: function(e) {
-            console.log(e);
+            $("#comment").val('');
           }
-        });
+        })
       });
 
       $(document).on('click', '.delete', function() {
         var id = $(this).attr("id");
-        console.log(id);
-        if (confirm("Are you sure you want to delete?"))
-        {
-          $.ajax({
-            url: "{{ route('comments.destroy') }}",
-            type: "POST",
-            headers: {
-              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: {'id': id },
-            success: function() {
-              
-            }
-          });
-        }
 
+        $.ajax({
+          url: "/posts/comment-delete",
+          type: 'POST',
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          data: { 'id': id },
+          success: function() {
+              fetch_data();
+          }
+        })
       })
 
-    });
+    })
   </script>
+
+{{--  <script>--}}
+{{--    $(document).ready(function() {--}}
+
+{{--      function listComments(res) {--}}
+
+{{--        var ul = $('#comment-section');--}}
+{{--        for (var count=0; count < res.count(); count++){--}}
+{{--          ul.append(`--}}
+{{--                <li class="list-group-item justify-content-between">${res.res.comment}--}}
+{{--                    <button type="button" id="${res.res.id}" class="btn btn-sm btn-danger delete">Delete</button>--}}
+{{--                </li>--}}
+{{--            `);--}}
+
+{{--          $('#comment').val('');--}}
+{{--        }--}}
+{{--      }--}}
+
+{{--      function fetch_data(res) {--}}
+
+{{--        var ul = $('#comment-section');--}}
+{{--        for (var count=0; count < res.count(); count++){--}}
+{{--          ul.append(`--}}
+{{--                <li class="list-group-item justify-content-between">${res.res.comment}--}}
+{{--                    <button type="button" id="${res.res.id}" class="btn btn-sm btn-danger delete">Delete</button>--}}
+{{--                </li>--}}
+{{--            `);--}}
+
+{{--          $('#comment').val('');--}}
+{{--        }--}}
+{{--      }--}}
+
+{{--      $('#commentForm').submit(function(e) {--}}
+{{--        e.preventDefault();--}}
+{{--        $form = $(this);--}}
+{{--        let comment = $('#comment').val();--}}
+
+{{--        $.ajax({--}}
+{{--          url: $form.attr('action'),--}}
+{{--          type: "POST",--}}
+{{--          headers: {--}}
+{{--            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
+{{--          },--}}
+{{--          data: {'comment': comment},--}}
+
+{{--          success: function(res) {--}}
+{{--            // $('.hidden').show().removeClass('hidden');--}}
+{{--            listComments(res);--}}
+{{--          },--}}
+{{--          error: function(e) {--}}
+{{--            console.log(e);--}}
+{{--          }--}}
+{{--        });--}}
+{{--      });--}}
+
+{{--      $(document).on('click', '.delete', function() {--}}
+{{--        var id = $(this).attr("id");--}}
+{{--        console.log(id);--}}
+{{--        if (confirm("Are you sure you want to delete?"))--}}
+{{--        {--}}
+{{--          $.ajax({--}}
+{{--            url: "{{ route('comments.destroy') }}",--}}
+{{--            type: "POST",--}}
+{{--            headers: {--}}
+{{--              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
+{{--            },--}}
+{{--            data: {'id': id },--}}
+{{--            success: function(res) {--}}
+{{--              fetch_data(res);--}}
+{{--            }--}}
+{{--          });--}}
+{{--        }--}}
+
+{{--      })--}}
+
+{{--    });--}}
+{{--  </script>--}}
 
 @endsection

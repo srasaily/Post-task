@@ -29,7 +29,8 @@ Route::prefix('posts')->group(function(){
     Route::delete('/{post}', 'PostController@destroy')->name('posts.destroy');
 
 //    Route::get('/comments/create', 'CommentController@create')->name('comments.create');
-    Route::post('/comments/{post}', 'CommentController@store')->name('comments.store');
+    Route::get('{post}/comments', 'CommentController@fetchData')->name('comments.fetch_data');
+    Route::post('{post}/comment-store', 'CommentController@storeData')->name('comments.store');
     Route::post('/comment-delete', 'CommentController@destroy')->name('comments.destroy');
 
 });

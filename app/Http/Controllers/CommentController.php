@@ -14,9 +14,12 @@ class CommentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function fetchData(Request $request, Post $post)
     {
-        //
+        if($request->ajax()){
+            $comments = $post->comments()->latest()->get();
+            return json_encode($comments);
+        }
     }
 
     /**
@@ -35,7 +38,7 @@ class CommentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, Post $post)
+    public function storeData(Request $request, Post $post)
     {
         $request->validate([
             'comment' => 'required'
@@ -49,7 +52,7 @@ class CommentController extends Controller
 //        $result = $post->comments()->save($comment);
 
         $response = $post->comments()->create($data);
-        return response()->json([ "res" => $response ]);
+        return json_encode($response);
 
 //        $comment = $request->except('_token');
 //        Comment::create($comment);
@@ -97,6 +100,10 @@ class CommentController extends Controller
      */
     public function destroy(Request $request)
     {
-        
+        if($request->ajax()){
+           Comment::where('id', $request->id)->delete();
+
+           return response()->json(["response" => "Comment deleted successfully"]);
+        }
     }
 }
